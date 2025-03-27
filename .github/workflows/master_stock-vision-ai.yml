@@ -14,7 +14,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read #This is required for actions/checkout
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
@@ -29,10 +29,13 @@ jobs:
           python -m venv venv
           source venv/bin/activate
       
+      - name: Update and Upgrade apt
+        run: |
+          sudo apt update && sudo apt upgrade -y
+          sudo apt install -y libgl1 libglib2.0-0
+
       - name: Install dependencies
         run: pip install -r requirements.txt
-        
-      # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
 
       - name: Zip artifact for deployment
         run: zip release.zip ./* -r
@@ -64,7 +67,6 @@ jobs:
       - name: Unzip artifact for deployment
         run: unzip release.zip
 
-      
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -78,4 +80,3 @@ jobs:
         with:
           app-name: 'stock-vision-ai'
           slot-name: 'Production'
-          
